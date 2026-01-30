@@ -1,0 +1,66 @@
+install.packages(c("ggplot2","ggridges","dplyr","viridis"))
+library(ggplot2)
+library(ggridges)
+library(dplyr)
+library(viridis)
+getwd()
+setwd("C:/Users/Ayyappa/Desktop/lab r")
+df <- read.csv("data set tip.csv")
+str(df)
+summary(df)
+
+ggplot(df, aes(x = day, y = total_bill)) +
+  stat_summary(fun = "mean", geom = "bar", fill = "steelblue") +
+  labs(title="Average Total Bill by Day")
+
+ggplot(df, aes(x = day, y = total_bill, fill = sex)) +
+  geom_bar(stat = "summary", position = "dodge") +
+  labs(title="Total Bill by Day & Sex")
+
+ggplot(df, aes(x = day, fill = smoker)) +
+  geom_bar(position = "stack") +
+  labs(title="Smoker Status Count by Day")
+
+ggplot(df, aes(x = total_bill, y = day)) +
+  geom_point(color = "darkgreen") +
+  labs(title="Total Bill Distribution by Day")
+
+
+# Create numeric correlation matrix
+num_df <- df %>% select(total_bill, tip, size)
+cor_mat <- cor(num_df)
+
+# Long format
+cor_df <- as.data.frame(as.table(cor_mat))
+
+ggplot(cor_df, aes(Var1, Var2, fill = Freq)) +
+  geom_tile() +
+  scale_fill_viridis() +
+  labs(title="Heatmap of Numeric Correlations")
+
+
+ggplot(df, aes(x = day, y = tip)) +
+  geom_violin(fill = "pink") +
+  labs(title="Tip Distribution by Day")
+
+ggplot(df, aes(x = tip, y = time, fill = time)) +
+  geom_density_ridges(alpha = 0.7) +
+  scale_fill_viridis(discrete = TRUE) +
+  labs(title="Tip Density by Meal Time")
+
+ggplot(df, aes(x = total_bill)) +
+  geom_histogram(binwidth = 3, fill = "orange", color="black") +
+  labs(title="Histogram of Total Bill")
+
+ggplot(df, aes(x = tip, fill = smoker)) +
+  geom_density(alpha = 0.6) +
+  labs(title="Density Plot of Tips (Smoker vs Non-Smoker)")
+
+ggplot(df, aes(x = time, y = total_bill)) +
+  geom_boxplot(fill = "lightblue") +
+  labs(title="Total Bill by Meal Time")
+
+
+
+
+
