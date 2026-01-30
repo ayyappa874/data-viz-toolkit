@@ -1,0 +1,59 @@
+install.packages(c("ggplot2","hexbin","corrplot","igraph","ggfortify","dplyr"))
+
+library(ggplot2)
+library(hexbin)
+library(corrplot)
+library(igraph)
+library(ggfortify)
+library(dplyr)
+
+setwd("C:/Users/Ayyappa/Desktop/lab r")
+df <- read.csv("data set tip.csv")
+str(df)
+summary(df)
+
+
+ggplot(df, aes(x = total_bill, y = tip)) +
+  geom_point() +
+  labs(title = "Scatterplot: Total Bill vs Tip",
+       x = "Total Bill",
+       y = "Tip")
+
+ggplot(df, aes(x = total_bill, y = tip, size = size)) +
+  geom_point(alpha = 0.6) +
+  labs(title = "Bubble Chart: Bill vs Tip (Party Size as Bubble)",
+       x = "Total Bill",
+       y = "Tip")
+
+
+ggplot(df, aes(x = total_bill, y = tip)) +
+  geom_hex() +
+  labs(title = "Hexbin Plot: Density of Total Bill vs Tip",
+       x = "Total Bill",
+       y = "Tip")
+
+num_df <- df %>% select(total_bill, tip, size)
+
+corr_matrix <- cor(num_df)
+
+corrplot(corr_matrix, method = "circle")
+
+edges <- df %>%
+  count(day, time) %>%
+  rename(from = day, to = time)
+graph <- graph_from_data_frame(edges)
+
+plot(graph,
+     vertex.size = 25,
+     vertex.color = "lightblue",
+     edge.arrow.size = 0.5,
+     main = "Network Graph: Day → Time")
+
+pca_model <- prcomp(num_df, scale. = TRUE)
+autoplot(pca_model,
+         data = df,
+         colour = 'day',
+         main = "PCA of Tips Dataset")
+
+
+
