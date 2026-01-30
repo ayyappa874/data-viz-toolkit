@@ -1,0 +1,97 @@
+install.packages(c("ggplot2","treemapify","sunburstR","ggalluvial","networkD3","dplyr"))
+
+library(ggplot2)
+library(treemapify)
+library(sunburstR)
+library(ggalluvial)
+library(networkD3)
+library(dplyr)
+
+setwd("C:/Users/Ayyappa/Desktop/lab r")
+df <- read.csv("data set tip.csv")
+str(df)
+summary(df)
+pie_df <- df %>%
+  count(day) %>%
+  rename(Category = day, Value = n)
+
+ggplot(pie_df, aes(x = "", y = Value, fill = Category)) +
+  geom_bar(stat = "identity", width = 1) +
+  coord_polar("y") +
+  labs(title = "Proportion of Customers by Day") +
+  theme_void()
+
+stack_df <- df %>%
+  count(day, smoker) %>%
+  rename(Category = day, Subcategory = smoker, Value = n)
+
+ggplot(stack_df, aes(x = Category, y = Value, fill = Subcategory)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Smoker Proportion by Day")
+
+
+tree_df <- df %>%
+  group_by(day) %>%
+  summarise(Value = sum(total_bill)) %>%
+  rename(Category = day)
+ggplot(tree_df,
+       aes(area = Value, fill = Category, label = Category)) +
+  geom_treemap() +
+  geom_treemap_text(colour = "white", place = "centre") +
+  labs(title = "Treemap of Total Bill by Day")
+
+
+sun_df <- df %>%
+  count(day, time, smoker)
+
+sunburst_data <- data.frame(
+  sequence = paste(sun_df$day, sun_df$time, sun_df$smoker, sep = "-"),
+  freq = sun_df$n
+)
+sunburst(sunburst_data)
+
+
+alluvial_df <- df %>%
+  count(day, time, smoker) %>%
+  rename(Var1 = day, Var2 = time, Var3 = smoker, Freq = n)
+
+ggplot(alluvial_df,
+       aes(axis1 = Var1, axis2 = Var2, axis3 = Var3, y = Freq)) +
+  geom_alluvium(aes(fill = Var1)) +
+  geom_stratum() +
+  geom_text(stat = "stratum", aes(label = after_stat(stratum))) +
+  scale_x_discrete(limits = c("Day", "Time", "Smoker")) +
+  labs(title = "Parallel Sets: Day → Time → Smoker")
+
+
+links <- df %>%
+  count(day, time) %>%
+  rename(source = day, target = time, value = n)
+
+nodes <- data.frame(
+  name = unique(c(links$source, links$target))
+)
+
+links$source <- match(links$source, nodes$name) - 1
+links$target <- match(links$target, nodes$name) - 1
+
+
+sankeyNetwork(
+  Links = links,
+  Nodes = nodes,
+  Source = "source",
+  Target = "target",
+  Value = "value",
+  NodeID = "name",
+  fontSize = 12
+)
+
+
+ggplot(df,aes(day,tip))+stat_summary(fun=mean,geom="bar")
+
+
+ggplot(df,aes(day,fill=smoker))+geom_bar()
+ggplot(df,aes(tip,day))+geom_point()
+
+ggplot(df,aes(day,time,fill=tip))+geom_tile()
+
