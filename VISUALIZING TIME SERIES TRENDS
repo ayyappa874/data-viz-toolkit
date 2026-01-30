@@ -1,0 +1,39 @@
+library(ggplot2)
+library(dplyr)
+library(forecast)
+install.packages("forecast")
+
+setwd("C:/Users/Ayyappa/Desktop/lab r")
+df <- read.csv("data set tip.csv")
+str(df)
+summary(df)
+
+df$Date <- as.Date("2023-01-01") + seq_len(nrow(df)) - 1
+
+ggplot(df, aes(x = Date, y = total_bill)) +
+  geom_line() +
+  labs(title = "Line Plot: Total Bill Over Time",
+       x = "Date",
+       y = "Total Bill")
+ggplot(df, aes(x = Date, y = total_bill, color = day)) +
+  geom_line() +
+  labs(title = "Multiple Line Plot: Total Bill by Day")
+
+
+ggplot(df, aes(x = total_bill, y = tip)) +
+  geom_line() +
+  geom_smooth(method = "loess") +
+  labs(title = "Dose–Response Curve: Tip vs Total Bill",
+       x = "Total Bill (Dose)",
+       y = "Tip (Response)")
+
+ts_data <- ts(df$total_bill, frequency = 7)
+stl_result <- stl(ts_data, s.window = "periodic")
+
+plot(stl_result)
+
+ggplot(df, aes(x = Date, y = total_bill)) +
+  geom_line(color = "grey") +
+  geom_smooth(method = "loess") +
+  labs(title = "Smoothed Trend of Total Bill Over Time")
+
