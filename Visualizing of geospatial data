@@ -1,0 +1,35 @@
+library(ggplot2)
+library(leaflet)
+library(rgl)
+install.packages("leaflet")
+install.packages("rgl")
+setwd("C:/Users/Ayyappa/Desktop/lab r")
+df <- read.csv("geo_df.csv")
+str(df)
+summary(df)
+
+ggplot(geo_df, aes(x = Longitude, y = Latitude, size = Value)) +
+  geom_point(color = "blue", alpha = 0.7) +
+  labs(title = "Geospatial Intensity Across Cities")
+
+ggplot(geo_df, aes(x = Longitude, y = Latitude)) +
+  stat_density2d(aes(fill = ..level..), geom = "polygon") +
+  labs(title = "Spatial Heatmap of City Density")
+
+plot3d(
+  x = geo_df$Longitude,
+  y = geo_df$Latitude,
+  z = geo_df$Value,
+  col = "blue",
+  size = 5
+)
+
+
+leaflet(geo_df) %>%
+  addTiles() %>%
+  addCircles(
+    lng = ~Longitude,
+    lat = ~Latitude,
+    weight = 1,
+    radius = ~Value * 100
+  )
