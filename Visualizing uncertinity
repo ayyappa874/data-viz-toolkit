@@ -1,0 +1,52 @@
+getwd()
+setwd("C:/Users/Ayyappa/Desktop/lab r")
+df <- read.csv("data set tip.csv")
+str(df)
+summary(df)
+install.packages(c("ggplot2","ggridges","dplyr","viridis"))
+library(ggplot2)
+library(ggridges)
+library(dplyr)
+library(viridis)
+
+ci_df <- df %>%
+  group_by(day) %>%
+  summarise(
+    Value = mean(tip),
+    Lower = Value - sd(tip),
+    Upper = Value + sd(tip)
+  )
+ggplot(ci_df, aes(x = day, y = Value)) +
+  geom_point() +
+  geom_errorbar(aes(ymin = Lower, ymax = Upper)) +
+  labs(title = "Confidence Interval of Tips by Day")
+
+
+boot_samples <- replicate(1000, mean(sample(df$tip, replace = TRUE)))
+
+df_boot <- data.frame(Value = boot_samples)
+
+ggplot(df_boot, aes(x = Value)) +
+  geom_density(alpha = 0.3) +
+  labs(title = "Bootstrap Distribution of Mean Tip")
+
+
+ggplot(df, aes(x = total_bill, y = tip)) +
+  geom_point(
+    alpha = 0.5,
+    position = position_jitter(width = 0.2)
+  ) +
+  labs(title = "Scatterplot with Jitter & Transparency")
+
+
+ggplot(df, aes(x = total_bill, y = tip)) +
+  geom_bin2d() +
+  labs(title = "2D Histogram: Bill vs Tip")
+
+
+ggplot(df, aes(x = total_bill, y = tip)) +
+  geom_density_2d() +
+  labs(title = "2D Density Contours")
+
+
+
